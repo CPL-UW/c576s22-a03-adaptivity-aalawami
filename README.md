@@ -1,3 +1,5 @@
+Sorry I didn't do this sooner //_//
+
 # CS576-Tetris-Sample
 
 1. Clone this repo
