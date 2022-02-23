@@ -15,7 +15,7 @@ public class GMScript : MonoBehaviour
     public TileBase emptyTile;
     public TileBase chunkTile;
     public int almLines = 0;
-    public int freeKill = 0;
+    public int freeKill = 3;
     public bool fkr = false;
     //public TileBase[] numberTiles;
     public Tilemap boardMap;
@@ -79,16 +79,32 @@ public class GMScript : MonoBehaviour
 
     bool MakeNewPiece(int midX, int maxY)
     {
-        if (null != _myPiece) 
-            return false;
-        var targetPiece = PIECES[Random.Range(0, PIECES.Length)];
-        _myPiece = new Vector3Int[targetPiece.Length];
-        for (var i = 0; i < targetPiece.Length; i++)
+        if(almLines < 15)
         {
-            _myPiece[i].x = targetPiece[i].x + midX;
-            _myPiece[i].y = targetPiece[i].y + maxY;
+            if (null != _myPiece)
+                return false;
+            var targetPiece = PIECES[Random.Range(0, PIECES.Length)];
+            _myPiece = new Vector3Int[targetPiece.Length];
+            for (var i = 0; i < targetPiece.Length; i++)
+            {
+                _myPiece[i].x = targetPiece[i].x + midX;
+                _myPiece[i].y = targetPiece[i].y + maxY;
+            }
+            return ValidPiece();
+        } else
+        {
+            if (null != _myPiece)
+                return false;
+            var targetPiece = PIECES[Random.Range(0, PIECES.Length - 1)];
+            _myPiece = new Vector3Int[targetPiece.Length -1];
+            for (var i = 0; i < targetPiece.Length -1; i++)
+            {
+                _myPiece[i].x = targetPiece[i].x + midX;
+                _myPiece[i].y = targetPiece[i].y + maxY;
+            }
+            return ValidPiece();
         }
-        return ValidPiece();
+        
     }
     
     void BlankBaseBoard()
@@ -133,11 +149,16 @@ public class GMScript : MonoBehaviour
                 Vector3Int [] movedPieces = {new(p.x, p.y - 1, p.z)};
                 newChunk = newChunk.Concat(movedPieces).ToArray();
                 almLines = almLines + 1;
-            } else if (p.y < row || freeKill < 3)
+            } else if (p.y < row || fkr)
             {
                 Vector3Int [] movedPieces = {p};
                 newChunk = newChunk.Concat(movedPieces).ToArray();
-                if (freeKill > 3 || freeKill == 3) { freeKill = freeKill - 1; }
+                if (fkr) 
+                { 
+                    freeKill = freeKill - 1; 
+                    fkr = false; 
+                }
+                
             } 
         }
 
@@ -329,7 +350,7 @@ public class GMScript : MonoBehaviour
             }
         }
 
-        if (almLines > 12 && freeKill < 3) 
+        if (almLines > 1 && freeKill > 0) 
         { 
             fkr = true;
             CheckKillChunk();  
@@ -344,7 +365,7 @@ public class GMScript : MonoBehaviour
             }
         }
         else _inARow = 0;
-        infoText.text = $"PTS:{_score}\n\nMAX:{_difficulty}\n\nCURRIC\n576";
+        infoText.text = $"PTS:{_score}\n\nMAX:{_difficulty}\nFK:{freeKill}\n\nCURRIC\n576";
         _fixedUpdateCount = 1;
     }
     
