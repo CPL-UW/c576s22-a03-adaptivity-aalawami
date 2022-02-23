@@ -14,6 +14,9 @@ public class GMScript : MonoBehaviour
     public TileBase pieceTile;
     public TileBase emptyTile;
     public TileBase chunkTile;
+    public int almLines = 0;
+    public int freeKill = 0;
+    public bool fkr = false;
     //public TileBase[] numberTiles;
     public Tilemap boardMap;
     public TMP_Text infoText;
@@ -122,18 +125,22 @@ public class GMScript : MonoBehaviour
     bool KillRow(int row)
     {
         var newChunk = new Vector3Int[] { };
+        almLines = 0;
         foreach (var p in _myChunk)
         {
             if (p.y > row)
             {
                 Vector3Int [] movedPieces = {new(p.x, p.y - 1, p.z)};
                 newChunk = newChunk.Concat(movedPieces).ToArray();
-            } else if (p.y < row)
+                almLines = almLines + 1;
+            } else if (p.y < row || freeKill < 3)
             {
                 Vector3Int [] movedPieces = {p};
                 newChunk = newChunk.Concat(movedPieces).ToArray();
-            }
+                if (freeKill > 3 || freeKill == 3) { freeKill = freeKill - 1; }
+            } 
         }
+
         _myChunk = newChunk;
         return true;
     }
@@ -141,8 +148,10 @@ public class GMScript : MonoBehaviour
     bool CheckKillChunk()
     {
         if (null == _myChunk) return false;
+
         for (var row = _minBy; row <= _maxBy; row++)
         {
+            if (fkr) { KillRow(1); }
             var maxCount = _maxBx - _minBx + 1; 
             foreach (var p in _myChunk)
             {
@@ -320,10 +329,19 @@ public class GMScript : MonoBehaviour
             }
         }
 
+        if (almLines > 12 && freeKill < 3) 
+        { 
+            fkr = true;
+            CheckKillChunk();  
+        }
+
         if (CheckKillChunk())
         {
             _inARow++;
-            MakeRandomAngryChunk();
+            if (almLines < 12)
+            {
+                MakeRandomAngryChunk();
+            }
         }
         else _inARow = 0;
         infoText.text = $"PTS:{_score}\n\nMAX:{_difficulty}\n\nCURRIC\n576";
