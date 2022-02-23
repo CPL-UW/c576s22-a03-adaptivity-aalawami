@@ -1,5 +1,7 @@
 Sorry I didn't do this sooner //_//
 
+Made it so that random pieces only appear if 40% of horizontal lines are empty, if score is low and the 75% of horizontal lines are full makes new pieces 3 tiles onstead of 4, also implemented a free line kill feature.
+
 # CS576-Tetris-Sample
 
 1. Clone this repo
