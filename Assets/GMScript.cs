@@ -79,7 +79,7 @@ public class GMScript : MonoBehaviour
 
     bool MakeNewPiece(int midX, int maxY)
     {
-        if(almLines < 15)
+        if(almLines < 15 || _score > 10)
         {
             if (null != _myPiece)
                 return false;
